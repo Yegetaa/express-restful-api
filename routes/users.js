@@ -3,6 +3,7 @@ const router = express.Router();
 
 const users = require("../data/users");
 const error = require("../utilities/error");
+const posts = require("../data/posts");
 
 router
   .route("/")
@@ -80,5 +81,31 @@ router
     if (user) res.json(user);
     else next();
   });
+
+//create a /api/users/:id/posts route 
+//that retrieve all posts by a user
+//with the specific id 
+
+router
+.route("/:id/posts")
+.get((req, res, next) => {
+  const user = users.find((u) => u.id == req.params.id);
+  const userPosts = posts.filter((p) => p.userId == req.params.id);
+  const links = [
+    {
+      href: `/${req.params.id}/posts`,
+      rel: "",
+      type: "GET"
+    }
+  ]
+  if(!user){
+    next(error(404, "User not found :("));
+    return;
+} else {
+  res.json({userPosts, links})
+}})
+
+
+
 
 module.exports = router;
